@@ -1,66 +1,122 @@
-// Главная страница - получение картин
+// app.js
+
+// ---------- ГЛАВНАЯ СТРАНИЦА ----------
 document.addEventListener("DOMContentLoaded", async () => {
     const artworkList = document.getElementById('artwork-list');
 
-    // Загружаем картины с сервера (API /artworks)
-    const response = await fetch('http://localhost:3000/artworks');
-    const artworks = await response.json();
+    if (artworkList) {
+        // Загружаем все картины
+        try {
+            const response = await fetch('http://localhost:3000/artworks');
+            const artworks = await response.json();
 
-    // Отображаем картины на главной странице
-    artworks.forEach(artwork => {
-        const artworkDiv = document.createElement('div');
-        artworkDiv.classList.add('artwork');
-        artworkDiv.innerHTML = `
-            <img src="${artwork.image_url}" alt="${artwork.title}">
-            <h3>${artwork.title}</h3>
-            <p>${artwork.price} $</p>
-            <a href="artwork.html?id=${artwork.id}">Подробнее</a>
-        `;
-        artworkList.appendChild(artworkDiv);
-    });
+            artworks.forEach(artwork => {
+                const artworkDiv = document.createElement('div');
+                artworkDiv.classList.add('artwork');
+                artworkDiv.innerHTML = `
+                    <img src="${artwork.image_url}" alt="${artwork.title}">
+                    <h3>${artwork.title}</h3>
+                    <p>${artwork.price} $</p>
+                    <p><strong>${artwork.is_sold ? 'Продано' : 'В наличии'}</strong></p>
+                    <a href="artwork.html?id=${artwork.id}">Подробнее</a>
+                `;
+                artworkList.appendChild(artworkDiv);
+            });
+        } catch (err) {
+            console.error("Ошибка при загрузке картин:", err);
+        }
+    }
 });
 
-// Страница картины - получение данных конкретной картины и комментариев
-const params = new URLSearchParams(window.location.search);
-const artworkId = params.get('id');
-if (artworkId) {
-    document.addEventListener("DOMContentLoaded", async () => {
-        // Получаем информацию о картине
-        const artworkResponse = await fetch(`http://localhost:3000/artworks/${artworkId}`);
-        const artwork = await artworkResponse.json();
-        document.getElementById('artwork-title').innerText = artwork.title;
-        document.getElementById('artwork-image').src = artwork.image_url;
-        document.getElementById('artwork-description').innerText = artwork.description;
-        document.getElementById('artwork-price').innerText = artwork.price;
+// ---------- СТРАНИЦА ОТДЕЛЬНОЙ КАРТИНЫ ----------
+document.addEventListener("DOMContentLoaded", async () => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
 
-        // Получаем комментарии
-        const commentsResponse = await fetch(`http://localhost:3000/comments/${artworkId}`);
+    if (!id) return;
+
+    const title = document.getElementById('artwork-title');
+    const image = document.getElementById('artwork-image');
+    const description = document.getElementById('artwork-description');
+    const price = document.getElementById('artwork-price');
+    const status = document.getElementById('artwork-status');
+    const buyBtn = document.getElementById('buy-btn');
+    const commentsList = document.getElementById('comments-list');
+    const commentForm = document.getElementById('comment-form');
+
+    try {
+        // Загрузка информации о картине
+        const response = await fetch(`http://localhost:3000/artworks/${id}`);
+        const artwork = await response.json();
+
+        title.textContent = artwork.title;
+        image.src = artwork.image_url;
+        description.textContent = artwork.description;
+        price.textContent = artwork.price + " $";
+        status.textContent = artwork.is_sold ? "Продано" : "В наличии";
+
+        if (artwork.is_sold) {
+            buyBtn.disabled = true;
+            buyBtn.textContent = "Продано";
+        }
+
+        // Обработка кнопки покупки
+        buyBtn.addEventListener("click", async () => {
+            console.log("Кнопка нажата");
+            const confirmBuy = confirm("Вы уверены, что хотите купить эту картину?");
+            if (!confirmBuy) return;
+
+            const buyResponse = await fetch(`http://localhost:3000/buy/${id}`, {
+                method: 'POST'
+            });
+
+            if (buyResponse.ok) {
+                alert("Покупка прошла успешно!");
+                buyBtn.disabled = true;
+                buyBtn.textContent = "Продано";
+                status.textContent = "Продано";
+            } else {
+                const result = await buyResponse.json();
+                alert("Ошибка: " + result.error);
+            }
+        });
+
+        // Загрузка комментариев
+        const commentsResponse = await fetch(`http://localhost:3000/comments/${id}`);
         const comments = await commentsResponse.json();
-        const commentsList = document.getElementById('comments-list');
 
         comments.forEach(comment => {
             const li = document.createElement('li');
-            li.innerText = `${comment.user_name}: ${comment.message}`;
+            li.textContent = `${comment.user_name}: ${comment.message}`;
             commentsList.appendChild(li);
         });
 
-        // Обработчик формы добавления комментария
-        const commentForm = document.getElementById('comment-form');
+        // Отправка комментария
         commentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const userName = document.getElementById('user-name').value;
-            const message = document.getElementById('comment-message').value;
+            const userName = document.getElementById('user-name').value.trim();
+            const message = document.getElementById('comment-message').value.trim();
 
-            const newComment = await fetch(`http://localhost:3000/comments/${artworkId}`, {
+            if (!userName || !message) {
+                alert("Заполните все поля!");
+                return;
+            }
+
+            const commentResponse = await fetch(`http://localhost:3000/comments/${id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_name: userName, message: message })
+                body: JSON.stringify({ user_name: userName, message })
             });
 
-            if (newComment.ok) {
+            if (commentResponse.ok) {
                 alert("Комментарий добавлен!");
-                window.location.reload(); // Перезагружаем страницу, чтобы увидеть новый комментарий
+                window.location.reload(); // обновим страницу
+            } else {
+                alert("Ошибка при добавлении комментария");
             }
         });
-    });
-}
+
+    } catch (err) {
+        console.error("Ошибка при загрузке картины:", err);
+    }
+});

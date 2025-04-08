@@ -21,12 +21,17 @@ Artwork.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    is_sold: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
     modelName: 'Artwork',
-    tableName: 'artworks', // Убедитесь, что имя таблицы указано правильно
-    timestamps: false, // Если в таблице нет полей createdAt и updatedAt
+    tableName: 'artworks',
+    timestamps: false,
   }
 );
 
