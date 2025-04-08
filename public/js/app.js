@@ -1,11 +1,10 @@
-// app.js
-
-// ---------- ГЛАВНАЯ СТРАНИЦА ----------
 document.addEventListener("DOMContentLoaded", async () => {
     const artworkList = document.getElementById('artwork-list');
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
 
+    // Главная страница
     if (artworkList) {
-        // Загружаем все картины
         try {
             const response = await fetch('http://localhost:3000/artworks');
             const artworks = await response.json();
@@ -25,14 +24,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (err) {
             console.error("Ошибка при загрузке картин:", err);
         }
+        return;
     }
-});
 
-// ---------- СТРАНИЦА ОТДЕЛЬНОЙ КАРТИНЫ ----------
-document.addEventListener("DOMContentLoaded", async () => {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-
+    // Страница картины
     if (!id) return;
 
     const title = document.getElementById('artwork-title');
@@ -45,7 +40,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const commentForm = document.getElementById('comment-form');
 
     try {
-        // Загрузка информации о картине
         const response = await fetch(`http://localhost:3000/artworks/${id}`);
         const artwork = await response.json();
 
@@ -60,9 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             buyBtn.textContent = "Продано";
         }
 
-        // Обработка кнопки покупки
         buyBtn.addEventListener("click", async () => {
-            console.log("Кнопка нажата");
             const confirmBuy = confirm("Вы уверены, что хотите купить эту картину?");
             if (!confirmBuy) return;
 
@@ -87,13 +79,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         comments.forEach(comment => {
             const li = document.createElement('li');
-            li.textContent = `${comment.user_name}: ${comment.message}`;
+            li.innerText = `${comment.user_name}: ${comment.message}`;
             commentsList.appendChild(li);
         });
 
-        // Отправка комментария
+        // Обработка формы комментариев
         commentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
             const userName = document.getElementById('user-name').value.trim();
             const message = document.getElementById('comment-message').value.trim();
 
@@ -102,15 +95,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
 
-            const commentResponse = await fetch(`http://localhost:3000/comments/${id}`, {
+            const newCommentResponse = await fetch(`http://localhost:3000/comments/${id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_name: userName, message })
+                body: JSON.stringify({ user_name: userName, message: message })
             });
 
-            if (commentResponse.ok) {
-                alert("Комментарий добавлен!");
-                window.location.reload(); // обновим страницу
+            if (newCommentResponse.ok) {
+                const newComment = await newCommentResponse.json();
+                const li = document.createElement('li');
+                li.textContent = `${newComment.user_name}: ${newComment.message}`;
+                commentsList.appendChild(li);
+                commentForm.reset();
             } else {
                 alert("Ошибка при добавлении комментария");
             }

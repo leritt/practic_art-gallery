@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const Comment = require('../models/Comment');
-const Artwork = require('../models/Artwork');
 
 // Получение комментариев для конкретной картины
 router.get('/:artworkId', async (req, res) => {
   try {
     const comments = await Comment.findAll({
       where: { artwork_id: req.params.artworkId },
-      order: [['created_at', 'ASC']], // Сортировка по дате
+      order: [['created_at', 'ASC']],
     });
     res.json(comments);
   } catch (err) {

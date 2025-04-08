@@ -5,10 +5,11 @@ class Comment extends Model {}
 
 Comment.init(
   {
-    artworkId: {
+    artwork_id: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
-        model: 'artworks', // Указывает на таблицу artworks
+        model: 'artworks',
         key: 'id',
       },
     },
@@ -24,8 +25,10 @@ Comment.init(
   {
     sequelize,
     modelName: 'Comment',
-    tableName: 'comments', // Убедитесь, что имя таблицы указано правильно
-    timestamps: true, // Добавление поля created_at
+    tableName: 'comments',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: false,
   }
 );
 
