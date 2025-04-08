@@ -26,7 +26,8 @@ h1 {
   font-size: 2.5em;
 }
 
-main {
+main,
+.purchase h1 {
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -129,7 +130,9 @@ button.disabled {
   border-radius: 5px;
 }
 
-#comment-form button {
+#comment-form button,
+.purchase button {
+  /* width: 100px; */
   padding: 10px 20px;
   background-color: #282c34;
   color: white;
@@ -137,7 +140,9 @@ button.disabled {
   border-radius: 5px;
   cursor: pointer;
 }
-
+.purchase button {
+  width: 200px;
+}
 #comment-form button:hover {
   background-color: #3e444f;
 }
@@ -148,4 +153,27 @@ button.disabled {
   margin: 0;
   border-radius: 2px;
   background-color: rgb(203, 203, 203);
+}
+#purchase-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.purchase h1{
+  text-align: center;
+}
+
+.purchase-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

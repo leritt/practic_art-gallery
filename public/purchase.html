@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Оформление покупки</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <header>
+    <h1>Онлайн-галерея картин</h1>
+    <p>Покупка картин</p>
+  </header>
+
+  <main>
+    <div class="purchase">
+      <h1>Оформление заказа</h1>
+      <form id="purchase-form">
+        <div class="purchase-labels">
+          <input type="hidden" id="artwork-id" />
+          <label>ФИО: <input type="text" name="fullname" required /></label><br />
+          <label>Адрес: <input type="text" name="address" required /></label><br />
+          <label>
+            Способ доставки:
+            <select name="delivery" required>
+              <option value="delivery">Доставка</option>
+              <option value="pickup">Самовывоз</option>
+            </select>
+          </label><br />
+          <label>Комментарий: <textarea name="note"></textarea></label><br />
+        </div>
+        <button type="submit">Подтвердить покупку</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    document.getElementById('artwork-id').value = id;
+
+    document.getElementById('purchase-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        id,
+        fullname: e.target.fullname.value,
+        address: e.target.address.value,
+        delivery: e.target.delivery.value,
+        note: e.target.note.value
+      };
+
+      const confirmBuy = confirm("Подтвердить заказ?");
+      if (!confirmBuy) return;
+
+      const res = await fetch(`http://localhost:3000/buy/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        alert("Покупка успешно оформлена!");
+        window.location.href = `artwork.html?id=${id}`;
+      } else {
+        const result = await res.json();
+        alert("Ошибка: " + result.error);
+      }
+    });
+  </script>
+  <footer>
+    <p>© 2025 Онлайн-галерея. Все права защищены.</p>
+  </footer>
+</body>
+
+</html>

@@ -63,22 +63,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         
 
         buyBtn.addEventListener("click", async () => {
-            const confirmBuy = confirm("Вы уверены, что хотите купить эту картину?");
-            if (!confirmBuy) return;
+            window.location.href = `purchase.html?id=${id}`;
 
-            const buyResponse = await fetch(`http://localhost:3000/buy/${id}`, {
-                method: 'POST'
-            });
-
-            if (buyResponse.ok) {
-                alert("Покупка прошла успешно!");
-                buyBtn.disabled = true;
-                buyBtn.textContent = "Продано";
-                status.textContent = "Продано";
-            } else {
-                const result = await buyResponse.json();
-                alert("Ошибка: " + result.error);
-            }
+            // if (buyResponse.ok) {
+            //     alert("Покупка прошла успешно!");
+            //     buyBtn.disabled = true;
+            //     buyBtn.textContent = "Продано";
+            //     status.textContent = "Продано";
+            // } else {
+            //     const result = await buyResponse.json();
+            //     alert("Ошибка: " + result.error);
+            // }
         });
 
         // Загрузка комментариев
