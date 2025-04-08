@@ -26,6 +26,10 @@ Artwork.init(
       allowNull: false,
       defaultValue: false,
     },
+    artist: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    }
   },
   {
     sequelize,

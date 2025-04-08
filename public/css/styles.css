@@ -29,7 +29,6 @@ h1 {
 main {
   display: flex;
   flex-direction: column;
-  height: 100%;
   padding: 20px;
 }
 
@@ -47,11 +46,15 @@ main {
 }
 
 .artwork {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   background-color: white;
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 200px;
+  width: 300px;
+  height: 350px;
   text-align: center;
   transition: transform 0.3s;
 }
@@ -77,7 +80,10 @@ footer {
 }
 
 .artwork-detail {
-  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 20px;
   background-color: white;
@@ -86,10 +92,28 @@ footer {
 }
 
 .artwork-detail img {
-  max-width: 100%;
+  max-width: 40%;
   height: auto;
   border-radius: 5px;
   margin-bottom: 20px;
+}
+
+#buy-btn {
+  width: 100px;
+  padding: 10px 20px;
+  background-color: #282c34;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  border: #3e444f 1px solid;
+  opacity: 0.7;
 }
 
 #comment-form {

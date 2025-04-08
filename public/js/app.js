@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!id) return;
 
     const title = document.getElementById('artwork-title');
+    const artist = document.getElementById('artwork-artist');
     const image = document.getElementById('artwork-image');
     const description = document.getElementById('artwork-description');
     const price = document.getElementById('artwork-price');
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const response = await fetch(`http://localhost:3000/artworks/${id}`);
         const artwork = await response.json();
 
+        artist.textContent = artwork.artist;
         title.textContent = artwork.title;
         image.src = artwork.image_url;
         description.textContent = artwork.description;
@@ -50,9 +52,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         status.textContent = artwork.is_sold ? "Продано" : "В наличии";
 
         if (artwork.is_sold) {
+            status.textContent = "Продано";
             buyBtn.disabled = true;
             buyBtn.textContent = "Продано";
+            buyBtn.classList.add('disabled'); // <- вот эта строка
+        } else {
+            status.textContent = "В наличии";
+            buyBtn.classList.remove('disabled'); // на всякий случай
         }
+        
 
         buyBtn.addEventListener("click", async () => {
             const confirmBuy = confirm("Вы уверены, что хотите купить эту картину?");
